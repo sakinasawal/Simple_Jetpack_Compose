@@ -1,3 +1,4 @@
 <resources>
-	<string name = "app_name">Jetpack Compose Training - Assignment 0</string>
+    <string name="app_name">Jetpack Compose Training - Assignment 0</string>
+    <string name="title_activity_main2">MainActivity2</string>
 </resources>
