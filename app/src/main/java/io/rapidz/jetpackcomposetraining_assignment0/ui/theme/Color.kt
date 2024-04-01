@@ -18,3 +18,6 @@ val OrangeBorder = Color(0xFFFFBF00)
 
 // Background
 val BackgroundColor = Color(0xFF026C89)
+
+// MaterialCardView
+val MaterialCardViewBgColor= Color(0xFF2D9972)

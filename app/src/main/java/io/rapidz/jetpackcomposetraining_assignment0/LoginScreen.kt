@@ -11,20 +11,32 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import io.rapidz.jetpackcomposetraining_assignment0.ui.theme.OrangeStart
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.navigation.NavHostController
+import io.rapidz.jetpackcomposetraining_assignment0.data.User
+import io.rapidz.jetpackcomposetraining_assignment0.repository.UserRepository
+import io.rapidz.jetpackcomposetraining_assignment0.storage.SharedPreferences
+import kotlinx.coroutines.runBlocking
 
 @Composable
-fun LoginScreen(){
+fun LoginScreen(userRepository : UserRepository,
+                sharedPreferences: SharedPreferences,
+                navController: NavHostController
+){
 
-    var username by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf(sharedPreferences.getLastLoginUsername() ?: "") }
     var password by remember { mutableStateOf("") }
-    val isError by remember { mutableStateOf(false) }
+    var errorText by remember { mutableStateOf("") }
+
+    val focusManager = LocalFocusManager.current
 
     val isLoginEnabled by remember(username, password) {
         derivedStateOf {
@@ -40,8 +52,8 @@ fun LoginScreen(){
             .padding(20.dp)
             .pointerInput(Unit) {
                 detectTapGestures(onTap = {
-                    // Hide the keyboard when the user taps outside the input fields
                     keyboardController?.hide()
+                    focusManager.clearFocus()
                 })
             },
         verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -58,29 +70,59 @@ fun LoginScreen(){
             value = username,
             onValueChange = { username = it },
             label = { Text("Username") },
-            shape = MaterialTheme.shapes.extraLarge,
-            isError = isError,
+            singleLine = true,
             keyboardOptions = KeyboardOptions.Default,
-            keyboardActions = KeyboardActions(onNext = { /* Handle next action */ }),
-            modifier = Modifier.fillMaxWidth()
+            keyboardActions = KeyboardActions(onDone = {
+                focusManager.moveFocus(FocusDirection.Down)
+            }),
+            shape = MaterialTheme.shapes.extraLarge,
         )
 
         // Password field
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text("Password")},
+            singleLine = true,
             shape = MaterialTheme.shapes.extraLarge,
-            isError = isError,
-            keyboardOptions = KeyboardOptions.Default,
-            keyboardActions = KeyboardActions(onNext = { /* Handle next action */ }),
-            modifier = Modifier.fillMaxWidth()
+            isError = errorText.isNotEmpty()
         )
+
+        if (errorText.isNotEmpty()) {
+            Text(
+                text = errorText,
+                color = Color.Red,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
 
         Spacer(modifier = Modifier.weight(1f))
 
-        Button(
-            onClick = { /* Handle login click */ },
+        Button(onClick = {
+            if (password.length < 8) {
+                errorText = "The password does not meet the requirement."
+                username = ""
+                password = ""
+            } else {
+                val user = runBlocking { userRepository.getUserByUsername(username) }
+                if (user != null){
+                    sharedPreferences.setLastLoginUsername(username)
+                    if (user.password != password){
+                        password = ""
+                        errorText = "Wrong password"
+                    } else {
+                        navController.navigate("list")
+                    }
+                }else {
+                    runBlocking {
+                        userRepository.insertUser(User(username = username, password = password))
+                        sharedPreferences.setLastLoginUsername(username)
+                        navController.navigate("list")
+                    }
+                }
+            }
+            focusManager.clearFocus()
+        },
             enabled = isLoginEnabled,
             colors = ButtonDefaults.buttonColors(containerColor = OrangeStart),
             modifier = Modifier
@@ -96,32 +138,4 @@ fun LoginScreen(){
     }
 }
 
-@Composable
-fun InputTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    isError: Boolean,
-    modifier: Modifier = Modifier
-) {
-    val textFieldModifier = Modifier.fillMaxWidth()
-    val keyboardOptions = KeyboardOptions.Default
-    val keyboardActions = KeyboardActions(onNext = { /* Handle next action */ })
 
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
-        shape = MaterialTheme.shapes.extraLarge,
-        isError = isError,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        modifier = modifier.then(textFieldModifier) // Apply both modifiers
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-    LoginScreen()
-}
