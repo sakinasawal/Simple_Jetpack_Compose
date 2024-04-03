@@ -1,5 +1,6 @@
 package io.rapidz.jetpackcomposetraining_assignment0
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
@@ -8,25 +9,26 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.*
-import androidx.compose.ui.graphics.drawscope.*
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.rapidz.jetpackcomposetraining_assignment0.ui.theme.*
-import kotlin.math.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import com.google.android.material.card.MaterialCardView
+import androidx.core.text.isDigitsOnly
+import androidx.navigation.NavHostController
 
 @Composable
-fun ListScreen() {
+fun ListScreen(navController: NavHostController) {
 
     Column(
         modifier = Modifier
@@ -38,80 +40,127 @@ fun ListScreen() {
         Text(
             text = "List",
             style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
-            modifier = Modifier.padding(top = 20.dp)
+            modifier = Modifier.padding(top = 12.dp)
         )
 
         val chipItems = listOf("Random", "Ascending Order", "Descending Order",
             "Number Only", "Word Only")
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            for (chipText in chipItems) {
-                Chip(
-                    text = chipText,
-                    onClick = {}
-                )
-            }
-        }
+        var selectedChip by remember { mutableStateOf<String?>(null) }
 
         val textList = listOf(
             "9384", "Android", "Good", "To", "3032", "Image", "9091", "Programming",
             "Coding", "1298", "9947", "8732", "iOS", "Mobile"
         )
 
+        val displayedList = remember { mutableStateOf(textList) }
+
+        ChipGroup(
+            chipItems = chipItems,
+            selectedChip = selectedChip,
+            onChipSelected = { chipText ->
+                selectedChip = chipText
+                displayedList.value = when (chipText) {
+                    "Random" -> textList.shuffled()
+                    "Ascending Order" -> textList.sorted()
+                    "Descending Order" -> textList.sortedDescending()
+                    "Number Only" -> textList.filter {
+                        it.isDigitsOnly()
+                    }
+                    "Word Only" -> textList.filter {
+                        it.all { c: Char ->  c.isLetter()}
+                    }
+                    else -> textList
+                }
+            }
+        )
+
         LazyColumn(
-            modifier = Modifier.padding(vertical = 16.dp)
+            modifier = Modifier
+                .weight(1f)
         ) {
-            items(textList) { text ->
+            items(displayedList.value) { text ->
                 MaterialCardView(
-                    modifier = Modifier.padding(vertical = 8.dp),
-                    cardColor = MaterialCardViewBgColor,
+                    modifier = Modifier.padding(vertical = 4.dp),
                 ) {
                     Text(
                         text = text,
-                        style = MaterialTheme.typography.body1,
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier
+                            .background(MaterialCardViewBgColor)
+                            .padding(16.dp),
                         color = Color.White,
                     )
                 }
             }
         }
+
+        Button(onClick = {
+            navController.navigate("image")
+        },
+            colors = ButtonDefaults.buttonColors(containerColor = OrangeCentre),
+            shape = RoundedCornerShape(10)
+            ) {
+            Text(
+                text = "Image",
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun ChipGroup(
+    chipItems: List<String>,
+    selectedChip: String?,
+    onChipSelected: (String) -> Unit
+) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(7.dp),
+        verticalArrangement = Arrangement.spacedBy(7.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+    ) {
+        chipItems.forEach { chipText ->
+            Chip(
+                text = chipText,
+                isSelected = chipText == selectedChip,
+                onClick = { onChipSelected(chipText) }
+            )
+        }
     }
 }
 
 @Composable
-fun Chip(text: String, isSelected: Boolean = false, onClick: () -> Unit) {
-    Surface(
-        shape = RoundedCornerShape(50),
-        elevation = 1.dp,
-        modifier = Modifier.clickable { onClick() },
-        color = if (isSelected) MaterialTheme.colors.primary else MaterialTheme.colors.surface
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.body2,
-            color = if (isSelected) MaterialTheme.colors.onPrimary
-            else MaterialTheme.colors.onSurface,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-        )
-    }
+fun Chip(
+    text: String,
+    isSelected: Boolean = false,
+    onClick: () -> Unit
+) {
+    Text(
+        text = text,
+        color = if (isSelected) Color.Gray
+        else Color.Black,
+        modifier = Modifier
+            .background(
+                color = Color.LightGray,
+                shape = CircleShape
+            )
+            .clickable { onClick() }
+            .padding(horizontal = 8.dp, vertical = 8.dp)
+    )
 }
-
 
 @Composable
 fun MaterialCardView(
     modifier: Modifier = Modifier,
-    cardColor: Color = MaterialTheme.colors.surface,
     content: @Composable () -> Unit
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(50),
-        backgroundColor = cardColor,
-        elevation = 4.dp,
         content = content
     )
 }

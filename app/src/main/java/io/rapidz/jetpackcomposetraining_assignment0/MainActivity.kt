@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
 fun MainApplication() {
     val navController = rememberNavController()
 
-    NavHost(navController, startDestination = "list") {
+    NavHost(navController, startDestination = "splash") {
         composable("splash") {
             SplashScreen(navController)
         }
@@ -47,7 +47,10 @@ fun MainApplication() {
                 navController)
         }
         composable("list") {
-            ListScreen()
+            ListScreen(navController)
+        }
+        composable("image") {
+            ImageScreen()
         }
     }
 }

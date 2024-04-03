@@ -20,6 +20,7 @@ import io.rapidz.jetpackcomposetraining_assignment0.ui.theme.OrangeStart
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
 import io.rapidz.jetpackcomposetraining_assignment0.data.User
 import io.rapidz.jetpackcomposetraining_assignment0.repository.UserRepository
@@ -85,7 +86,16 @@ fun LoginScreen(userRepository : UserRepository,
             label = { Text("Password")},
             singleLine = true,
             shape = MaterialTheme.shapes.extraLarge,
-            isError = errorText.isNotEmpty()
+            isError = errorText.isNotEmpty(),
+            trailingIcon = {
+                if (errorText.isNotEmpty()){
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_exclamation_mark),
+                        contentDescription = "Error",
+                        tint = Color.Red
+                    )
+                }
+            }
         )
 
         if (errorText.isNotEmpty()) {
