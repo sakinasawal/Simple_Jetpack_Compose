@@ -11,39 +11,39 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.*
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import io.rapidz.jetpackcomposetraining_assignment0.ui.theme.*
-import kotlin.math.*
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(navController: NavHostController) {
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = BackgroundColor)
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
-    ) {
+            .background(color = BackgroundColor),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
 
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ){
-            LogoImage(modifier = Modifier.size(200.dp))
+        GradientCircle(
+            modifier = Modifier.size(200.dp),
+            colors = listOf(OrangeStart, OrangeCentre, OrangeEnd),
+            radius = 100f
+        )
 
-            Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(100.dp))
 
-            Text(
-                text = stringResource(id = R.string.hello_world),
-                style = TextStyle(fontSize = 30.sp, color = Color.White, fontWeight = FontWeight.Bold)
-            )
-        }
+        Text(
+            text = stringResource(id = R.string.hello_world),
+            style = TextStyle(fontSize = 30.sp, color = Color.White, fontWeight = FontWeight.Bold)
+        )
     }
 
     LaunchedEffect(Unit) {
@@ -56,49 +56,34 @@ fun SplashScreen(navController: NavHostController) {
 }
 
 @Composable
-fun LogoImage(modifier: Modifier = Modifier) {
-    Canvas(modifier = modifier) {
-        val radius = size.minDimension / 2
-
-        // Draw the inner circle with gradient
-        drawLinearGradientCircle(
-            colors = listOf(OrangeStart, OrangeCentre, OrangeEnd),
-            radius = radius * 0.7f,
-            angle = 320f
-        )
-
-        // Draw the border circle
-        drawCircle(
-            color = OrangeBorder,
-            radius = radius * 0.7f,
-            style = Stroke(width = 4.dp.toPx())
-        )
-
-    }
-}
-
-// draw gradient with angle with complex calculation
-fun DrawScope.drawLinearGradientCircle(
-    colors: List<Color>,
-    radius: Float,
-    angle: Float
+fun GradientCircle(modifier: Modifier = Modifier,
+                   colors: List<Color>,
+                   radius: Float,
+                   borderWidth: Dp = 4.dp
 ) {
-    val centerX = size.width / 2
-    val centerY = size.height / 2
+    val borderWidthPx = with(LocalDensity.current) { borderWidth.toPx() }
 
-    val startX = centerX + radius * cos(Math.toRadians(angle.toDouble())).toFloat()
-    val startY = centerY + radius * sin(Math.toRadians(angle.toDouble())).toFloat()
+    Canvas(modifier = modifier.size(radius.dp * 2)) {
+        val centerX = size.width / 2f
+        val centerY = size.height / 2f
+        val gradientRadius = size.width / 2f
+        val gradientAngle = 230f
 
-    val endX = centerX - radius * cos(Math.toRadians(angle.toDouble())).toFloat()
-    val endY = centerY - radius * sin(Math.toRadians(angle.toDouble())).toFloat()
+        rotate(-gradientAngle, pivot = Offset(centerX, centerY)) {
+            val gradient = Brush.linearGradient(
+                colors = colors,
+                start = Offset(centerX - gradientRadius, centerY),
+                end = Offset(centerX + gradientRadius, centerY)
+            )
 
-    drawCircle(
-        brush = Brush.linearGradient(
-            colors = colors,
-            start = Offset(startX, startY),
-            end = Offset(endX, endY)
-        ),
-        radius = radius
-    )
+            drawCircle(brush = gradient, radius = gradientRadius)
+        }
+
+        drawCircle(
+            brush = Brush.linearGradient(listOf(OrangeBorder, OrangeBorder)),
+            style = Stroke(width = borderWidthPx),
+            radius = gradientRadius
+        )
+    }
 }
 

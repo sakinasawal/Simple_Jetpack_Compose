@@ -21,6 +21,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import io.rapidz.jetpackcomposetraining_assignment0.data.User
 import io.rapidz.jetpackcomposetraining_assignment0.repository.UserRepository
@@ -32,7 +33,6 @@ fun LoginScreen(userRepository : UserRepository,
                 sharedPreferences: SharedPreferences,
                 navController: NavHostController
 ){
-
     var username by remember { mutableStateOf(sharedPreferences.getLastLoginUsername() ?: "") }
     var password by remember { mutableStateOf("") }
     var errorText by remember { mutableStateOf("") }
@@ -61,7 +61,7 @@ fun LoginScreen(userRepository : UserRepository,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
         Text(
-            text = "Login ",
+            text = stringResource(id = R.string.login),
             style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
             modifier = Modifier.padding(top = 20.dp)
         )
@@ -70,7 +70,7 @@ fun LoginScreen(userRepository : UserRepository,
         OutlinedTextField(
             value = username,
             onValueChange = { username = it },
-            label = { Text("Username") },
+            label = { Text(stringResource(id = R.string.username)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default,
             keyboardActions = KeyboardActions(onDone = {
@@ -83,7 +83,7 @@ fun LoginScreen(userRepository : UserRepository,
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password")},
+            label = { Text(stringResource(id = R.string.password))},
             singleLine = true,
             shape = MaterialTheme.shapes.extraLarge,
             isError = errorText.isNotEmpty(),
@@ -140,7 +140,7 @@ fun LoginScreen(userRepository : UserRepository,
                 .height(50.dp),
         ) {
             Text(
-                text = "Login",
+                text = stringResource(id = R.string.login),
                 color = Color.White,
                 fontWeight = FontWeight.Bold
             )
