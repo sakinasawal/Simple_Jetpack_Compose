@@ -33,16 +33,16 @@ fun SplashScreen(navController: NavHostController) {
     ){
 
         GradientCircle(
-            modifier = Modifier.size(200.dp),
+            modifier = Modifier.size(size_circle_gradient),
             colors = listOf(OrangeStart, OrangeCentre, OrangeEnd),
-            radius = 100f
+            radius = radius_circle
         )
 
-        Spacer(modifier = Modifier.height(100.dp))
+        Spacer(modifier = Modifier.height(spacing_100))
 
         Text(
             text = stringResource(id = R.string.hello_world),
-            style = TextStyle(fontSize = 30.sp, color = Color.White, fontWeight = FontWeight.Bold)
+            style = TextStyle(fontSize = font_size_30, color = Color.White, fontWeight = FontWeight.Bold)
         )
     }
 
@@ -59,7 +59,7 @@ fun SplashScreen(navController: NavHostController) {
 fun GradientCircle(modifier: Modifier = Modifier,
                    colors: List<Color>,
                    radius: Float,
-                   borderWidth: Dp = 4.dp
+                   borderWidth: Dp = border_width
 ) {
     val borderWidthPx = with(LocalDensity.current) { borderWidth.toPx() }
 
@@ -67,7 +67,7 @@ fun GradientCircle(modifier: Modifier = Modifier,
         val centerX = size.width / 2f
         val centerY = size.height / 2f
         val gradientRadius = size.width / 2f
-        val gradientAngle = 230f
+        val gradientAngle = gradient_angle
 
         rotate(-gradientAngle, pivot = Offset(centerX, centerY)) {
             val gradient = Brush.linearGradient(

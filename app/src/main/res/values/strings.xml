@@ -2,9 +2,11 @@
     <string name="app_name">Jetpack Compose Training - Assignment 0</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="hello_world">Hello World!</string>
+    <string name="hello_world_image">Hello, World</string>
     <string name="login">Login</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="password_not_meet_requirement">The password does not meet the requirement.</string>
+    <string name="wrong_password">Wrong Password</string>
     <string name="title_activity_list_screen">ListScreen</string>
 </resources>

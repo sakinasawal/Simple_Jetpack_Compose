@@ -27,67 +27,81 @@ import androidx.compose.ui.graphics.Color
 import androidx.core.text.isDigitsOnly
 import androidx.navigation.NavHostController
 
+enum class Chip{
+    RANDOM, ASCENDING_ORDER, DESCENDING_ORDER, NUMBER_ONLY, WORD_ONLY
+}
+
+data class ChipItems (
+    val chipSorting: Chip ?= null,
+    val name : String = ""
+)
+
+
+
 @Composable
 fun ListScreen(navController: NavHostController) {
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp),
+            .padding(spacing_20),
+        verticalArrangement = Arrangement.spacedBy(spacing_20),
         horizontalAlignment = Alignment.CenterHorizontally
     ){
         Text(
             text = "List",
-            style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
-            modifier = Modifier.padding(top = 12.dp)
+            style = TextStyle(fontSize = font_size_24, fontWeight = FontWeight.Bold),
+            modifier = Modifier.padding(top = spacing_12)
         )
 
-        val chipItems = listOf("Random", "Ascending Order", "Descending Order",
-            "Number Only", "Word Only")
-
-        var selectedChip by remember { mutableStateOf<String?>(null) }
+        var selectedChip by remember { mutableStateOf<Chip?>(null) }
 
         val textList = listOf(
             "9384", "Android", "Good", "To", "3032", "Image", "9091", "Programming",
             "Coding", "1298", "9947", "8732", "iOS", "Mobile"
         )
 
+        val chipItem = listOf(ChipItems(Chip.RANDOM, "andom"),
+            ChipItems(Chip.ASCENDING_ORDER, "Ascending Order"),
+            ChipItems(Chip.DESCENDING_ORDER, "Descending Order"),
+            ChipItems(Chip.NUMBER_ONLY, "Number Only"),
+            ChipItems(Chip.WORD_ONLY, "Word Only")
+            )
+
         val displayedList = remember { mutableStateOf(textList) }
 
         ChipGroup(
-            chipItems = chipItems,
+            chipItems = chipItem,
             selectedChip = selectedChip,
             onChipSelected = { chipText ->
                 selectedChip = chipText
                 displayedList.value = when (chipText) {
-                    "Random" -> textList.shuffled()
-                    "Ascending Order" -> textList.sorted()
-                    "Descending Order" -> textList.sortedDescending()
-                    "Number Only" -> textList.filter {
+                     Chip.RANDOM-> textList.shuffled()
+                     Chip.ASCENDING_ORDER -> textList.sorted()
+                     Chip.DESCENDING_ORDER -> textList.sortedDescending()
+                     Chip.NUMBER_ONLY -> textList.filter {
                         it.isDigitsOnly()
                     }
-                    "Word Only" -> textList.filter {
+                    Chip.WORD_ONLY -> textList.filter {
                         it.all { c: Char ->  c.isLetter()}
                     }
-                    else -> textList
                 }
             }
         )
 
         LazyColumn(
             modifier = Modifier
-                .weight(1f)
+                .weight(weight_1f)
         ) {
             items(displayedList.value) { text ->
                 MaterialCardView(
-                    modifier = Modifier.padding(vertical = 4.dp),
+                    modifier = Modifier.padding(vertical = spacing_4),
                 ) {
                     Text(
                         text = text,
                         modifier = Modifier
                             .background(MaterialCardViewBgColor)
-                            .padding(16.dp),
+                            .padding(spacing_16),
                         color = Color.White,
                     )
                 }
@@ -98,7 +112,7 @@ fun ListScreen(navController: NavHostController) {
             navController.navigate("image")
         },
             colors = ButtonDefaults.buttonColors(containerColor = OrangeCentre),
-            shape = RoundedCornerShape(10)
+            shape = RoundedCornerShape(percent_10)
             ) {
             Text(
                 text = "Image",
@@ -112,22 +126,22 @@ fun ListScreen(navController: NavHostController) {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ChipGroup(
-    chipItems: List<String>,
-    selectedChip: String?,
-    onChipSelected: (String) -> Unit
+    chipItems: List<ChipItems>,
+    selectedChip: Chip?,
+    onChipSelected: (Chip) -> Unit
 ) {
     FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(7.dp),
-        verticalArrangement = Arrangement.spacedBy(7.dp),
+        horizontalArrangement = Arrangement.spacedBy(spacing_7),
+        verticalArrangement = Arrangement.spacedBy(spacing_7),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = spacing_16),
     ) {
         chipItems.forEach { chipText ->
             Chip(
-                text = chipText,
-                isSelected = chipText == selectedChip,
-                onClick = { onChipSelected(chipText) }
+                text = chipText.name,
+                isSelected = chipText.chipSorting == selectedChip,
+                onClick = { onChipSelected(chipText.chipSorting!!) }
             )
         }
     }
@@ -149,7 +163,7 @@ fun Chip(
                 shape = CircleShape
             )
             .clickable { onClick() }
-            .padding(horizontal = 8.dp, vertical = 8.dp)
+            .padding(horizontal = spacing_8, vertical = spacing_8)
     )
 }
 
@@ -160,7 +174,7 @@ fun MaterialCardView(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(50),
+        shape = RoundedCornerShape(percent_50),
         content = content
     )
 }

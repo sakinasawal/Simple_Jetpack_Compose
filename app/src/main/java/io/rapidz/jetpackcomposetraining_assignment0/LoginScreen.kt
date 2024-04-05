@@ -11,7 +11,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.unit.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.input.pointer.pointerInput
@@ -19,6 +18,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import io.rapidz.jetpackcomposetraining_assignment0.ui.theme.OrangeStart
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -26,6 +26,7 @@ import androidx.navigation.NavHostController
 import io.rapidz.jetpackcomposetraining_assignment0.data.User
 import io.rapidz.jetpackcomposetraining_assignment0.repository.UserRepository
 import io.rapidz.jetpackcomposetraining_assignment0.storage.SharedPreferences
+import io.rapidz.jetpackcomposetraining_assignment0.ui.theme.*
 import kotlinx.coroutines.runBlocking
 
 @Composable
@@ -33,12 +34,16 @@ fun LoginScreen(userRepository : UserRepository,
                 sharedPreferences: SharedPreferences,
                 navController: NavHostController
 ){
+    // by remember : refresh one fun screen
     var username by remember { mutableStateOf(sharedPreferences.getLastLoginUsername() ?: "") }
     var password by remember { mutableStateOf("") }
     var errorText by remember { mutableStateOf("") }
 
     val focusManager = LocalFocusManager.current
 
+    val context = LocalContext.current
+
+    // derivedStateOf : convert one or multiple state objects into another state
     val isLoginEnabled by remember(username, password) {
         derivedStateOf {
             username.isNotBlank() && password.isNotBlank()
@@ -50,20 +55,20 @@ fun LoginScreen(userRepository : UserRepository,
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(20.dp)
+            .padding(all = spacing_20)
             .pointerInput(Unit) {
                 detectTapGestures(onTap = {
                     keyboardController?.hide()
                     focusManager.clearFocus()
                 })
             },
-        verticalArrangement = Arrangement.spacedBy(20.dp),
+        verticalArrangement = Arrangement.spacedBy(spacing_20),
         horizontalAlignment = Alignment.CenterHorizontally
     ){
         Text(
             text = stringResource(id = R.string.login),
-            style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
-            modifier = Modifier.padding(top = 20.dp)
+            style = TextStyle(fontSize = font_size_24, fontWeight = FontWeight.Bold),
+            modifier = Modifier.padding(top = spacing_20)
         )
 
         // Username field
@@ -102,7 +107,7 @@ fun LoginScreen(userRepository : UserRepository,
             Text(
                 text = errorText,
                 color = Color.Red,
-                modifier = Modifier.padding(top = 4.dp)
+                modifier = Modifier.padding(top = spacing_4)
             )
         }
 
@@ -110,7 +115,7 @@ fun LoginScreen(userRepository : UserRepository,
 
         Button(onClick = {
             if (password.length < 8) {
-                errorText = "The password does not meet the requirement."
+                errorText = context.getString(R.string.password_not_meet_requirement)
                 username = ""
                 password = ""
             } else {
@@ -119,7 +124,7 @@ fun LoginScreen(userRepository : UserRepository,
                     sharedPreferences.setLastLoginUsername(username)
                     if (user.password != password){
                         password = ""
-                        errorText = "Wrong password"
+                        errorText = context.getString(R.string.wrong_password)
                     } else {
                         navController.navigate("list")
                     }
@@ -137,7 +142,7 @@ fun LoginScreen(userRepository : UserRepository,
             colors = ButtonDefaults.buttonColors(containerColor = OrangeStart),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp),
+                .height(spacing_50),
         ) {
             Text(
                 text = stringResource(id = R.string.login),
