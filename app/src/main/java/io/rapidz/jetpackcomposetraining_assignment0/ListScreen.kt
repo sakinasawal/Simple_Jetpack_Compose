@@ -61,7 +61,7 @@ fun ListScreen(navController: NavHostController) {
             "Coding", "1298", "9947", "8732", "iOS", "Mobile"
         )
 
-        val chipItem = listOf(ChipItems(Chip.RANDOM, "andom"),
+        val chipItem = listOf(ChipItems(Chip.RANDOM, "Random"),
             ChipItems(Chip.ASCENDING_ORDER, "Ascending Order"),
             ChipItems(Chip.DESCENDING_ORDER, "Descending Order"),
             ChipItems(Chip.NUMBER_ONLY, "Number Only"),
